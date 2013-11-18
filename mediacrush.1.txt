@@ -1,0 +1,57 @@
+mediacrush (1)
+==============
+
+Name
+----
+mediacrush - Upload media files to https://mediacru.sh
+
+Synopsis
+--------
+'mediacrush' [options] [files...]
+
+Description
+-----------
+
+MediaCrush is a media hosting service that can host images, audio, and
+video files on the web. The utility of the same name can upload files
+to MediaCrush from a shell.
+
+Options
+-------
+*-a*::
+	Create an album from the uploaded files.
+
+*-r*::
+	When given a directory as a file, the default behavior is to
+	upload all files in that directory. When -r is specified, all
+	files and all files in each subfolder (recursively) will be
+	uploaded instead.
+
+*-s* <server>::
+	Specify an alternate MediaCrush server (the default is
+	https://mediacru.sh)
+
+*-h*::
+	Display help message and exit.
+
+Examples
+--------
+
+mediacrush picture1.png picture2.png::
+	Uploads the two pictures to MediaCrush and prints their URLs to
+	stdout.
+
+mediacrush -s https://example.com picture1.png picture2.png
+	Uploads the same pictures to a MediaCrush-compatible endpoint on
+	https://example.com.
+
+mediacrush -a *.{png,jpg}
+	Creates an album of all image files in the working directory.
+
+Authors
+-------
+
+Current maintainers:
+
+* Jerome Leclanche <jerome.leclanche+mediacrush@gmail.com>
+* Drew DeVault <admin@mediacru.sh>

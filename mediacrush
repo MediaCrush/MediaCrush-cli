@@ -1,0 +1,100 @@
+#!/bin/bash
+# MediaCrush (https://mediacru.sh) uploader
+# Jerome Leclanche <jerome.leclanche+mediacrush@gmail.com>
+
+server="https://mediacru.sh"
+recursive=false
+create_album=false
+uploads=""
+
+usage() {
+    cat << EOF
+usage: $(basename $0) [options] [files...]
+Upload files to https://mediacru.sh
+For more details see man mediacrush
+
+  -a            Create an album from the uploaded files
+  -r            Recursively upload directories
+  -s SERVER     Specify a different server to upload to (default: https://mediacru.sh)
+  -h            Display this help and exit
+EOF
+}
+
+err() {
+    echo
+    echo "$@" 1>&2
+}
+
+if [[ $# -eq 0 ]]; then
+    usage
+    exit 1
+fi
+
+while getopts "h?rsa:" OPTION; do
+    case $OPTION in
+        h|\?)
+            usage
+            exit
+            ;;
+        r)
+            recursive=true
+            shift 1
+            ;;
+        s)
+            server=$OPTARG
+            shift 2
+            ;;
+        a)
+            create_album=true
+            shift 1
+            ;;
+    esac
+done
+
+upload() {
+    for f in "$@"; do
+
+        if [[ -d "$f" ]]; then
+            if [[ $recursive == true ]]; then
+                upload "$f/*"
+            else
+                err "omitting directory: $f"
+                continue
+            fi
+        fi
+
+        echo -n "Uploading $f ..."
+        url="$server/api/upload/file"
+        out=$(curl --silent -F "file=@$f" "$url")
+
+        if [[ $? -ne 0 ]]; then
+            err "Could not upload to $url"
+            continue
+        fi
+
+        hash=$(echo $out | sed -nre 's#.*"hash": "([^"]+)".*#\1#p')
+        error=$(echo $out | sed -nre 's#.*"error": ([0-9]+) .*#\1#p')
+
+        if [[ $error == "415" ]]; then
+            type=$(file --mime "$f")
+            err "The file type for $type is not supported"
+        fi
+
+        if [[ $uploads == "" ]]; then
+            uploads="$hash"
+        else
+            uploads="$uploads,$hash"
+        fi
+
+        echo -e "\r\033[KUploaded:" $server/$hash
+    done
+
+    if [[ $create_album == true ]]; then
+        echo -n "Creating album..."
+        out=$(curl --silent -F "list=$uploads" "$server/api/album/create")
+        hash=$(echo $out | sed -nre 's#.*"hash": "([^"]+)".*#\1#p')
+        echo -e "\r\033[KAlbum:" $server/$hash
+    fi
+}
+
+upload "$@"
