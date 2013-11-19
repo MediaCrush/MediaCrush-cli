@@ -41,11 +41,11 @@ mediacrush picture1.png picture2.png::
 	Uploads the two pictures to MediaCrush and prints their URLs to
 	stdout.
 
-mediacrush -s https://example.com picture1.png picture2.png
+mediacrush -s https://example.com picture1.png picture2.png::
 	Uploads the same pictures to a MediaCrush-compatible endpoint on
 	https://example.com.
 
-mediacrush -a *.{png,jpg}
+mediacrush -a *.{png,jpg}::
 	Creates an album of all image files in the working directory.
 
 Authors
