@@ -1,7 +1,7 @@
-PREFIX?=/usr
+PREFIX?=/usr/local
 DESTDIR?=$(PREFIX)
-BINDIR?=$(DESTDIR)/bin
-MANDIR?=$(DESTDIR)/share/man/man1
+BINDIR?=$(PREFIX)/$(DESTDIR)/bin
+MANDIR?=$(PREFIX)/$(DESTDIR)/share/man/man1
 
 docgen?=a2x
 
@@ -16,8 +16,7 @@ clean:
 install:
 	install -Dm755 mediacrush $(BINDIR)/mediacrush
 	install -Dm644 mediacrush.1 $(MANDIR)/mediacrush.1
-	gzip -9 "$(MANDIR)/mediacrush.1"
 
 uninstall:
 	rm $(BINDIR)/mediacrush
-	rm -f $(MANDIR)/mediacrush.1.gz
+	rm -f $(MANDIR)/mediacrush.1
