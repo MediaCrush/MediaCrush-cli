@@ -8,7 +8,7 @@ license=(MIT)
 depends=('bash' 'curl')
 makedepends=('asciidoc')
 source=(https://github.com/MediaCrush/MediaCrush-cli/archive/$pkgver.tar.gz)
-md5sums=('8ea6cf59679f626b6c3a12a7c69e6e05')
+md5sums=('e3bdf7601df19d092c47e816ba4fced7')
 
 build() { 
   make -C "MediaCrush-cli-$pkgver"
