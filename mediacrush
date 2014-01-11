@@ -78,6 +78,7 @@ upload() {
         if [[ $error == "415" ]]; then
             type=$(file --mime "$f")
             err "The file type for $type is not supported"
+            continue
         fi
 
         if [[ $uploads == "" ]]; then
