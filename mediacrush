@@ -79,6 +79,10 @@ upload() {
             type=$(file --mime "$f")
             err "The file type for $type is not supported"
             continue
+        elif [[ $error == "420" ]]; then
+            err "You are uploading too much, too fast. Try again later."
+            # abort everything, no sense trying to upload more
+            exit 420
         fi
 
         if [[ $uploads == "" ]]; then
