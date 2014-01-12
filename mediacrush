@@ -31,23 +31,38 @@ if [[ $# -eq 0 ]]; then
     exit 1
 fi
 
-while getopts "h?rsa:" OPTION; do
-    case $OPTION in
-        h|\?)
+GETOPT=`getopt -o hars: --longoptions help,album,recursive,server: -- "$@"`
+if [[ $? != 0 ]]; then
+    exit 1
+fi
+
+eval set -- "$GETOPT"
+
+while true; do
+    case "$1" in
+        -h|--help)
             usage
             exit
             ;;
-        r)
+        -r|--recursive)
             recursive=true
             shift 1
             ;;
-        s)
-            server=$OPTARG
+        -s|--server)
+            server="$2"
             shift 2
             ;;
-        a)
+        -a|--album)
             create_album=true
             shift 1
+            ;;
+        --)
+            shift
+            break
+            ;;
+        *)
+            echo "Internal error"
+            exit 1
             ;;
     esac
 done
