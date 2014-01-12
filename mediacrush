@@ -14,11 +14,12 @@ usage: $(basename $0) $version [options] [files...]
 Upload files to https://mediacru.sh
 For more details see man mediacrush
 
-  -a            Create an album from the uploaded files
-  --open        Open the uploaded images (or the album if there is one) in the browser after upload
-  -r            Recursively upload directories
-  -s SERVER     Specify a different server to upload to (default: https://mediacru.sh)
-  -h            Display this help and exit
+  -a, --album             Create an album from the uploaded files
+      --open              Open the uploaded images (or the album if there is one) in the browser
+                            after upload has completed
+  -r, --recursive         Recursively upload directories
+  -s, --server=SERVER     Specify a different server to upload to (default: https://mediacru.sh)
+  -h, --help              Display this help and exit
 EOF
 }
 
