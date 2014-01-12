@@ -2,6 +2,7 @@
 # MediaCrush (https://mediacru.sh) uploader
 # Jerome Leclanche <jerome.leclanche+mediacrush@gmail.com>
 
+version=1.0.1
 server="https://mediacru.sh"
 recursive=false
 create_album=false
@@ -9,7 +10,7 @@ uploads=""
 
 usage() {
     cat << EOF
-usage: $(basename $0) [options] [files...]
+usage: $(basename $0) $version [options] [files...]
 Upload files to https://mediacru.sh
 For more details see man mediacrush
 
