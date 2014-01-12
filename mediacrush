@@ -20,6 +20,7 @@ For more details see man mediacrush
   -r, --recursive         Recursively upload directories
   -s, --server=SERVER     Specify a different server to upload to (default: https://mediacru.sh)
   -h, --help              Display this help and exit
+      --version           Output version information and exit
 EOF
 }
 
@@ -33,7 +34,7 @@ if [[ $# -eq 0 ]]; then
     exit 1
 fi
 
-GETOPT=`getopt -o hars: --longoptions help,album,open,recursive,server: -- "$@"`
+GETOPT=`getopt -o hars: --longoptions help,version,album,open,recursive,server: -- "$@"`
 if [[ $? != 0 ]]; then
     exit 1
 fi
@@ -44,6 +45,10 @@ while true; do
     case "$1" in
         -h|--help)
             usage
+            exit
+            ;;
+        --version)
+            echo $(basename $0) $version
             exit
             ;;
         -r|--recursive)
