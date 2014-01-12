@@ -4,8 +4,9 @@
 
 version=1.0.1
 server="https://mediacru.sh"
-recursive=false
 create_album=false
+dry_run=false
+recursive=false
 uploads=""
 
 usage() {
@@ -17,6 +18,7 @@ For more details see man mediacrush
   -a, --album             Create an album from the uploaded files
       --open              Open the uploaded images (or the album if there is one) in the browser
                             after upload has completed
+      --dry-run           Do not upload, only display the urls the files would be uploaded to.
   -r, --recursive         Recursively upload directories
   -s, --server=SERVER     Specify a different server to upload to (default: https://mediacru.sh)
   -h, --help              Display this help and exit
@@ -34,7 +36,7 @@ if [[ $# -eq 0 ]]; then
     exit 1
 fi
 
-GETOPT=`getopt -o hars: --longoptions help,version,album,open,recursive,server: -- "$@"`
+GETOPT=`getopt -o hars: --longoptions help,version,album,dry-run,open,recursive,server: -- "$@"`
 if [[ $? != 0 ]]; then
     exit 1
 fi
@@ -51,6 +53,18 @@ while true; do
             echo $(basename $0) $version
             exit
             ;;
+        -a|--album)
+            create_album=true
+            shift 1
+            ;;
+        --dry-run)
+            dry_run=true
+            shift 1
+            ;;
+        --open)
+            open_files=true
+            shift 1
+            ;;
         -r|--recursive)
             recursive=true
             shift 1
@@ -58,14 +72,6 @@ while true; do
         -s|--server)
             server="$2"
             shift 2
-            ;;
-        -a|--album)
-            create_album=true
-            shift 1
-            ;;
-        --open)
-            open_files=true
-            shift 1
             ;;
         --)
             shift
@@ -77,6 +83,10 @@ while true; do
             ;;
     esac
 done
+
+calculate_hash() {
+    md5sum $1 | xxd -r -p | base64 | cut -d " " -f 1 | sed "s|+|-|" | sed "s|/|_|" | cut -c 1-12
+}
 
 upload() {
     for f in "$@"; do
@@ -91,6 +101,13 @@ upload() {
         fi
 
         echo -n "Uploading $f ..."
+
+        if [[ $dry_run == true ]]; then
+            hash=$(calculate_hash $f)
+            echo -e "\r\033[KUploaded: $server/$hash"
+            continue
+        fi
+
         url="$server/api/upload/file"
         out=$(curl --silent -F "file=@$f" "$url")
 
