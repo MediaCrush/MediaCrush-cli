@@ -15,6 +15,7 @@ Upload files to https://mediacru.sh
 For more details see man mediacrush
 
   -a            Create an album from the uploaded files
+  --open        Open the uploaded images (or the album if there is one) in the browser after upload
   -r            Recursively upload directories
   -s SERVER     Specify a different server to upload to (default: https://mediacru.sh)
   -h            Display this help and exit
@@ -31,7 +32,7 @@ if [[ $# -eq 0 ]]; then
     exit 1
 fi
 
-GETOPT=`getopt -o hars: --longoptions help,album,recursive,server: -- "$@"`
+GETOPT=`getopt -o hars: --longoptions help,album,open,recursive,server: -- "$@"`
 if [[ $? != 0 ]]; then
     exit 1
 fi
@@ -54,6 +55,10 @@ while true; do
             ;;
         -a|--album)
             create_album=true
+            shift 1
+            ;;
+        --open)
+            open_files=true
             shift 1
             ;;
         --)
@@ -107,14 +112,22 @@ upload() {
             uploads="$uploads,$hash"
         fi
 
-        echo -e "\r\033[KUploaded:" $server/$hash
+        echo -e "\r\033[KUploaded: $server/$hash"
     done
 
     if [[ $create_album == true ]]; then
         echo -n "Creating album..."
         out=$(curl --silent -F "list=$uploads" "$server/api/album/create")
         hash=$(echo $out | sed -nre 's#.*"hash": "([^"]+)".*#\1#p')
-        echo -e "\r\033[KAlbum:" $server/$hash
+        echo -e "\r\033[KAlbum: $server/$hash"
+
+        if [[ $open_files == true ]]; then
+            xdg-open "$server/$hash"
+        fi
+    elif [[ $open_files == true ]]; then
+        for upload in "$uploads"; do
+            xdg-open "$server/$upload"
+        done
     fi
 }
 
