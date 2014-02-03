@@ -1,3 +1,6 @@
+/////
+vim:set ts=4 sw=4 tw=82 noet:
+/////
 mediacrush (1)
 ==============
 
@@ -18,21 +21,30 @@ to MediaCrush from a shell.
 
 Options
 -------
-*-a*::
+*-a, \--album*::
 	Create an album from the uploaded files.
 
-*-r*::
-	When given a directory as a file, the default behavior is to
-	upload all files in that directory. When -r is specified, all
-	files and all files in each subfolder (recursively) will be
-	uploaded instead.
-
-*-s* <server>::
-	Specify an alternate MediaCrush server (the default is
-	https://mediacru.sh)
+*\--dry-run*::
+	Does not actually upload files, but instead displays the URLs they would be
+	assigned after upload.
 
 *-h*::
 	Display help message and exit.
+
+*\--open*::
+	Opens the uploaded images (or the album, if -a is specified) in the browser
+	after the upload has completed
+
+*-r, \--recursive*::
+	When given a directory as a file, the default behavior is to upload all files
+	in that directory. When -r is specified, all files and all files in each
+	subfolder (recursively) will be uploaded instead.
+
+*-s, \--server* <server>::
+	Specifies an alternate MediaCrush server. (Default: https://mediacru.sh)
+
+*\--version*::
+	Output version information and exit.
 
 Examples
 --------
