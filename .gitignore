@@ -1,3 +1,4 @@
 # manfiles
 *.1
+*.1.gz
 PKGBUILD
