@@ -1,6 +1,6 @@
 .PHONY: install
 
-PREFIX := /usr
+DESTDIR := /usr
 
 all: mediacrush.1.gz
 
