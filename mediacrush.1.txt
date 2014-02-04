@@ -66,4 +66,4 @@ Authors
 Current maintainers:
 
 * Jerome Leclanche <jerome.leclanche+mediacrush@gmail.com>
-* Drew DeVault <admin@mediacru.sh>
+* Drew DeVault <drew@mediacru.sh>
