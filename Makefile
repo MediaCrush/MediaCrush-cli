@@ -11,9 +11,11 @@ mediacrush.1.gz: mediacrush.1
 	cat mediacrush.1 | gzip > mediacrush.1.gz
 
 install: mediacrush.1
-	install -c -m 775 mediacrush $(PREFIX)/bin/mediacrush
-	install -m 644 mediacrush.1.gz $(PREFIX)/share/man/man1/mediacrush.1
+	mkdir -p $(DESTDIR)/bin/
+	mkdir -p $(DESTDIR)/share/man/man1/
+	install -c -m 775 mediacrush $(DESTDIR)/bin/mediacrush
+	install -m 644 mediacrush.1.gz $(DESTDIR)/share/man/man1/mediacrush.1
 
 uninstall:
-	rm $(PREFIX)/bin/mediacrush
-	rm $(PREFIX)/share/man/man1/mediacrush.1
+	rm $(DESTDIR)/bin/mediacrush
+	rm $(DESTDIR)/share/man/man1/mediacrush.1
