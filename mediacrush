@@ -84,8 +84,17 @@ while true; do
     esac
 done
 
+xxdrp() {
+	i=0;
+	while [ $i -lt ${#1} ]; do
+		echo -ne "\x${1:$i:2}";
+		let i+=2;
+	done;
+}
+
+
 calculate_hash() {
-    md5sum $1 | xxd -r -p | base64 | cut -d " " -f 1 | sed "s|+|-|" | sed "s|/|_|" | cut -c 1-12
+    md5sum $1 | xxdrp | base64 | cut -d " " -f 1 | tr "+/" "-_" | cut -c 1-12
 }
 
 upload() {
