@@ -92,7 +92,7 @@ xxdrp() {
 
 
 calculate_hash() {
-    md5sum $1 | cut -d " " -f 1 | xxdrp | base64 | tr "+/" "-_" | cut -c 1-12
+    md5sum "$1" | cut -d " " -f 1 | xxdrp | base64 | tr "+/" "-_" | cut -c 1-12
 }
 
 upload() {
@@ -100,7 +100,7 @@ upload() {
 
         if [[ -d "$f" ]]; then
             if [[ $recursive == true ]]; then
-                upload "$f/*"
+                upload "$f"/*
             else
                 err "omitting directory: $f"
                 continue
@@ -110,7 +110,7 @@ upload() {
         echo -n "Uploading $f ..."
 
         if [[ $dry_run == true ]]; then
-            hash=$(calculate_hash $f)
+            hash=$(calculate_hash "$f")
             echo -e "\r\033[KUploaded: $server/$hash"
             continue
         fi
