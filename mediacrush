@@ -85,10 +85,9 @@ done
 
 xxdrp() {
     for i in `fold -2`; do
-        echo -ne "\x${i}";
+        echo -ne "\x$i"
     done;
 }
-
 
 calculate_hash() {
     md5sum "$1" | cut -d " " -f 1 | xxdrp | base64 | tr "+/" "-_" | cut -c 1-12
@@ -159,7 +158,7 @@ upload() {
     for f in "$@"; do
 
         if [[ -d "$f" ]]; then
-            if [[ $recursive == true ]]; then
+            if [[ "$recursive" == "true" ]]; then
                 upload "$f"/*
             else
                 err "omitting directory: $f"
@@ -194,7 +193,7 @@ upload() {
             fi
         fi
 
-        if [[ $uploads == "" ]]; then
+        if [[ "$uploads" == "" ]]; then
             uploads="$hash"
         else
             uploads="$uploads,$hash"
@@ -203,8 +202,8 @@ upload() {
         echo "Uploaded: $server/$hash"
     done
 
-    if [[ $create_album == true ]]; then
-        if [[ $dry_run == true ]]; then
+    if [[ "$create_album" == "true" ]]; then
+        if [[ "$dry_run" == "true" ]]; then
             echo "Album: (not available)"
         else
             echo -n "Creating album..."
@@ -213,11 +212,11 @@ upload() {
             hash=$(get_hash "$out")
             echo "Album: $server/$hash"
 
-            if [[ $open_files == true ]]; then
+            if [[ "$open_files" == "true" ]]; then
                 xdg-open "$server/$hash"
             fi
         fi
-    elif [[ $open_files == true ]]; then
+    elif [[ "$open_files" == "true" ]]; then
         for upload in "$uploads"; do
             xdg-open "$server/$upload"
         done
