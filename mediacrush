@@ -94,14 +94,65 @@ calculate_hash() {
     md5sum "$1" | cut -d " " -f 1 | xxdrp | base64 | tr "+/" "-_" | cut -c 1-12
 }
 
+get_error() {
+    echo "$1" | sed -nre 's#.*"error": ([0-9]+) .*#\1#p'
+}
+
+get_hash() {
+    echo "$1" | sed -nre 's#.*"hash": "([^"]+)".*#\1#p'
+}
+
+send() {
+    curl --silent "$@"
+
+    if [[ $? -ne 0 ]]; then
+        err "Could not reach $url"
+        return $?
+    fi
+}
+
+handle_response() {
+    hash=$(get_hash "$1")
+
+    if [[ -n "$hash" ]]; then
+        echo "$hash"
+        return 0
+    fi
+
+    error=$(get_error "$1")
+    case "$error" in
+        "415")
+            type=$(file --mime "$f")
+            err "The file type for $type is not supported"
+            return 415
+            ;;
+        "420")
+            err "You are uploading too much, too fast. Try again later."
+            # abort everything, no sense trying to upload more
+            exit 420
+            ;;
+        *)
+            err "Unknown error $error $1"
+            return 1
+            ;;
+    esac
+}
+
+check_exists() {
+    url="$server/api/$1/exists"
+    send "$url" | sed -nre 's#.*"exists": (true|false)#\1#p'
+}
+
 upload_file() {
     url="$server/api/upload/file"
-    out=$(curl --silent -F "file=@$1" "$url")
+    out=$(send -F "file=@$1" "$url")
+    handle_response "$out"
 }
 
 upload_url() {
     url="$server/api/upload/url"
-    out=$(curl --silent -F "url=$1" "$url")
+    out=$(send -F "url=$1" "$url")
+    handle_response "$out"
 }
 
 upload() {
@@ -114,46 +165,33 @@ upload() {
                 err "omitting directory: $f"
                 continue
             fi
+        elif [[ -f "$f" ]]; then
+            hash=$(calculate_hash "$f")
+        elif [[ "$f" == http://* ||  "$f" == https://* ]]; then
+            is_url="true"
+        else
+            err "No such file or directory: $f"
+            continue
         fi
 
         echo -n "Uploading $f ..."
         echo -en "\r\033[K"
 
-        if [[ $dry_run == true ]]; then
-            if [[ -f "$f" ]]; then
-                hash=$(calculate_hash "$f")
-                echo "Uploaded: $server/$hash"
-            elif [[ "$f" == http://* ||  "$f" == https://* ]]; then
+        if [[ "$dry_run" == "true" ]]; then
+            if [[ "$is_url" == "true" ]]; then
                 err "Dry-run not supported for URLs"
             else
-                err "No such file or directory: $f"
+                echo "Uploaded: $server/$hash"
             fi
             continue
         fi
 
-        if [[ -f "$f" ]]; then
-            upload_file "$f"
+        if [[ "$is_url" == "true" ]]; then
+            hash=$(upload_url "$f")
         else
-            upload_url "$f"
-        fi
-
-
-        if [[ $? -ne 0 ]]; then
-            err "Could not upload to $url"
-            continue
-        fi
-
-        hash=$(echo $out | sed -nre 's#.*"hash": "([^"]+)".*#\1#p')
-        error=$(echo $out | sed -nre 's#.*"error": ([0-9]+) .*#\1#p')
-
-        if [[ $error == "415" ]]; then
-            type=$(file --mime "$f")
-            err "The file type for $type is not supported"
-            continue
-        elif [[ $error == "420" ]]; then
-            err "You are uploading too much, too fast. Try again later."
-            # abort everything, no sense trying to upload more
-            exit 420
+            if [[ $(check_exists "$hash") != "true" ]]; then
+                hash=$(upload_file "$f")
+            fi
         fi
 
         if [[ $uploads == "" ]]; then
@@ -170,8 +208,9 @@ upload() {
             echo "Album: (not available)"
         else
             echo -n "Creating album..."
-            out=$(curl --silent -F "list=$uploads" "$server/api/album/create")
-            hash=$(echo $out | sed -nre 's#.*"hash": "([^"]+)".*#\1#p')
+            echo -en "\r\033[K"
+            out=$(send -F "list=$uploads" "$server/api/album/create")
+            hash=$(get_hash "$out")
             echo "Album: $server/$hash"
 
             if [[ $open_files == true ]]; then
