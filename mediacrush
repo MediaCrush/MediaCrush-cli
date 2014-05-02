@@ -85,9 +85,9 @@ while true; do
 done
 
 xxdrp() {
-	for i in `fold -2`; do
-		echo -ne "\x${i}";
-	done;
+    for i in `fold -2`; do
+        echo -ne "\x${i}";
+    done;
 }
 
 
@@ -149,14 +149,14 @@ upload() {
         if [[ $dry_run == true ]]; then
             echo "Album: (not available)"
         else
-			echo -n "Creating album..."
-			out=$(curl --silent -F "list=$uploads" "$server/api/album/create")
-			hash=$(echo $out | sed -nre 's#.*"hash": "([^"]+)".*#\1#p')
-			echo -e "\r\033[KAlbum: $server/$hash"
+            echo -n "Creating album..."
+            out=$(curl --silent -F "list=$uploads" "$server/api/album/create")
+            hash=$(echo $out | sed -nre 's#.*"hash": "([^"]+)".*#\1#p')
+            echo -e "\r\033[KAlbum: $server/$hash"
 
-			if [[ $open_files == true ]]; then
-				xdg-open "$server/$hash"
-			fi
+            if [[ $open_files == true ]]; then
+                xdg-open "$server/$hash"
+            fi
         fi
     elif [[ $open_files == true ]]; then
         for upload in "$uploads"; do
