@@ -53,6 +53,10 @@ mediacrush picture1.png picture2.png::
 	Uploads the two pictures to MediaCrush and prints their URLs to
 	stdout.
 
+mediacrush picture1.png http://example.com/picture2.png::
+	Uploads a picture on local disk and a picture on a remote server
+	to MediaCrush and prints their URLs to stdout.
+
 mediacrush -s https://example.com picture1.png picture2.png::
 	Uploads the same pictures to a MediaCrush-compatible endpoint on
 	https://example.com.

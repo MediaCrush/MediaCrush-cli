@@ -27,7 +27,6 @@ EOF
 }
 
 err() {
-    echo
     echo "$@" 1>&2
 }
 
@@ -95,6 +94,16 @@ calculate_hash() {
     md5sum "$1" | cut -d " " -f 1 | xxdrp | base64 | tr "+/" "-_" | cut -c 1-12
 }
 
+upload_file() {
+    url="$server/api/upload/file"
+    out=$(curl --silent -F "file=@$1" "$url")
+}
+
+upload_url() {
+    url="$server/api/upload/url"
+    out=$(curl --silent -F "url=$1" "$url")
+}
+
 upload() {
     for f in "$@"; do
 
@@ -108,15 +117,26 @@ upload() {
         fi
 
         echo -n "Uploading $f ..."
+        echo -en "\r\033[K"
 
         if [[ $dry_run == true ]]; then
-            hash=$(calculate_hash "$f")
-            echo -e "\r\033[KUploaded: $server/$hash"
+            if [[ -f "$f" ]]; then
+                hash=$(calculate_hash "$f")
+                echo "Uploaded: $server/$hash"
+            elif [[ "$f" == http://* ||  "$f" == https://* ]]; then
+                err "Dry-run not supported for URLs"
+            else
+                err "No such file or directory: $f"
+            fi
             continue
         fi
 
-        url="$server/api/upload/file"
-        out=$(curl --silent -F "file=@$f" "$url")
+        if [[ -f "$f" ]]; then
+            upload_file "$f"
+        else
+            upload_url "$f"
+        fi
+
 
         if [[ $? -ne 0 ]]; then
             err "Could not upload to $url"
@@ -142,7 +162,7 @@ upload() {
             uploads="$uploads,$hash"
         fi
 
-        echo -e "\r\033[KUploaded: $server/$hash"
+        echo "Uploaded: $server/$hash"
     done
 
     if [[ $create_album == true ]]; then
@@ -152,7 +172,7 @@ upload() {
             echo -n "Creating album..."
             out=$(curl --silent -F "list=$uploads" "$server/api/album/create")
             hash=$(echo $out | sed -nre 's#.*"hash": "([^"]+)".*#\1#p')
-            echo -e "\r\033[KAlbum: $server/$hash"
+            echo "Album: $server/$hash"
 
             if [[ $open_files == true ]]; then
                 xdg-open "$server/$hash"
