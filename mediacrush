@@ -155,6 +155,12 @@ upload_url() {
 }
 
 upload() {
+    if [ -t 1 ]; then
+        interactive=true
+    else
+        interactive=false
+    fi
+
     for f in "$@"; do
 
         if [[ -d "$f" ]]; then
@@ -173,14 +179,20 @@ upload() {
             continue
         fi
 
-        echo -n "Uploading $f ..."
-        echo -en "\r\033[K"
+        if [[ "$interactive" == true ]]; then
+            echo -n "Uploading $f ..."
+            echo -en "\r\033[K"
+        fi
 
         if [[ "$dry_run" == "true" ]]; then
             if [[ "$is_url" == "true" ]]; then
                 err "Dry-run not supported for URLs"
             else
-                echo "Uploaded: $server/$hash"
+                if [[ "$interactive" == true ]]; then
+                    echo "Uploaded: $server/$hash"
+                else
+                    echo "$server/$hash"
+                fi
             fi
             continue
         fi
@@ -199,18 +211,30 @@ upload() {
             uploads="$uploads,$hash"
         fi
 
-        echo "Uploaded: $server/$hash"
+        if [[ "$interactive" == true ]]; then
+            echo "Uploaded: $server/$hash"
+        else
+            echo "$server/$hash"
+        fi
     done
 
     if [[ "$create_album" == "true" ]]; then
         if [[ "$dry_run" == "true" ]]; then
-            echo "Album: (not available)"
+            if [[ "$interactive" == true ]]; then
+                echo "Album: (not available)"
+            fi
         else
-            echo -n "Creating album..."
-            echo -en "\r\033[K"
+            if [[ "$interactive" == true ]]; then
+                echo -n "Creating album..."
+                echo -en "\r\033[K"
+            fi
             out=$(send -F "list=$uploads" "$server/api/album/create")
             hash=$(get_hash "$out")
-            echo "Album: $server/$hash"
+            if [[ "$interactive" == true ]]; then
+                echo "Album: $server/$hash"
+            else
+                echo "$server/$hash"
+            fi
 
             if [[ "$open_files" == "true" ]]; then
                 xdg-open "$server/$hash"
