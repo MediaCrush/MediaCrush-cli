@@ -40,6 +40,12 @@ Options
 	in that directory. When -r is specified, all files and all files in each
 	subfolder (recursively) will be uploaded instead.
 
+*\--interactive*::
+    Forces interactive mode (pretty output).
+
+*\--non-interactive*::
+    Forces non-interactive mode (link only).
+
 *-s, \--server* <server>::
 	Specifies an alternate MediaCrush server. (Default: https://mediacru.sh)
 

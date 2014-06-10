@@ -20,6 +20,8 @@ For more details see man mediacrush
                             after upload has completed
       --dry-run           Do not upload, only display the urls the files would be uploaded to.
   -r, --recursive         Recursively upload directories
+      --interactive       Force interactive mode
+      --non-interactive   Force non-interactive mode
   -s, --server <server>   Specifies an alternate MediaCrush server. (Default: https://mediacru.sh)
   -h, --help              Display this help and exit
       --version           Output version information and exit
