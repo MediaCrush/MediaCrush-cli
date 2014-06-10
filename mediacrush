@@ -35,7 +35,7 @@ if [[ $# -eq 0 ]]; then
     exit 1
 fi
 
-GETOPT=`getopt -o hars: --longoptions help,version,album,dry-run,open,recursive,server: -- "$@"`
+GETOPT=`getopt -o hars: --longoptions help,version,album,dry-run,open,recursive,interactive,non-interactive,server: -- "$@"`
 if [[ $? != 0 ]]; then
     exit 1
 fi
@@ -71,6 +71,14 @@ while true; do
         -s|--server)
             server="$2"
             shift 2
+            ;;
+        --interactive)
+            interactive=true
+            shift 1
+            ;;
+        --non-interactive)
+            interactive=false
+            shift 1
             ;;
         --)
             shift
@@ -155,10 +163,12 @@ upload_url() {
 }
 
 upload() {
-    if [ -t 1 ]; then
-        interactive=true
-    else
-        interactive=false
+    if [ -z $interactive ]; then
+        if [ -t 1 ]; then
+            interactive=true
+        else
+            interactive=false
+        fi
     fi
 
     for f in "$@"; do
