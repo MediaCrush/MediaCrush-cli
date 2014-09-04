@@ -49,6 +49,9 @@ Options
 *-s, \--server* <server>::
 	Specifies an alternate MediaCrush server. (Default: https://mediacru.sh)
 
+*-c, \--copy*::
+	Sends URL of last selection or album (if -a is specified) to clipboard. This requires xsel or xclip to be installed, otherwise -c is ignored.
+
 *\--version*::
 	Output version information and exit.
 
