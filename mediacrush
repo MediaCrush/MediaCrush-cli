@@ -75,7 +75,7 @@ while true; do
         -s|--server)
             server="$2"
             shift 2
-            ;;        
+            ;;
         -c|--copy)
             copy=true
             shift 1
