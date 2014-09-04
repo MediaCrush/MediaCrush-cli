@@ -7,6 +7,7 @@ server="https://mediacru.sh"
 create_album=false
 dry_run=false
 recursive=false
+copy=false
 uploads=""
 
 usage() {
@@ -25,6 +26,7 @@ For more details see man mediacrush
   -s, --server <server>   Specifies an alternate MediaCrush server. (Default: https://mediacru.sh)
   -h, --help              Display this help and exit
       --version           Output version information and exit
+  -c, --copy              Send url to clipboard using xsel or xclip
 EOF
 }
 
@@ -37,7 +39,7 @@ if [[ $# -eq 0 ]]; then
     exit 1
 fi
 
-GETOPT=`getopt -o hars: --longoptions help,version,album,dry-run,open,recursive,interactive,non-interactive,server: -- "$@"`
+GETOPT=`getopt -o hcars: --longoptions help,version,album,dry-run,open,recursive,copy,interactive,non-interactive,server: -- "$@"`
 if [[ $? != 0 ]]; then
     exit 1
 fi
@@ -73,6 +75,10 @@ while true; do
         -s|--server)
             server="$2"
             shift 2
+            ;;        
+        -c|--copy)
+            copy=true
+            shift 1
             ;;
         --interactive)
             interactive=true
@@ -256,6 +262,28 @@ upload() {
         for upload in "$uploads"; do
             xdg-open "$server/$upload"
         done
+    fi
+
+    if [[ "$copy" == true ]]; then
+       if hash xsel 2>/dev/null; then
+           usecm=1
+       elif hash xclip 2>/dev/null; then
+           usecm=2
+       else
+           usecm=3
+       fi
+
+       case $usecm in
+           1)
+               echo -n "$server/$hash" | xsel -b
+               ;;
+           2)
+               echo -n "$server/$hash" | xclip -selection clipboard
+               ;;
+           3)
+               echo "In order to use the --copy argument, xsel or xclip must be installed."
+               ;;
+       esac
     fi
 }
 
