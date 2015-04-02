@@ -1,9 +1,9 @@
 #!/bin/bash
-# MediaCrush (https://mediacru.sh) uploader
+# MediaCrush (https://imgrush.com) uploader
 # Jerome Leclanche <jerome@leclan.ch>
 
 version=1.2.0
-server="https://mediacru.sh"
+server="https://imgrush.com"
 create_album=false
 dry_run=false
 recursive=false
@@ -13,7 +13,7 @@ uploads=""
 usage() {
     cat << EOF
 usage: $(basename $0) $version [options] [files...]
-Upload files to https://mediacru.sh
+Upload files to https://imgrush.com
 For more details see man mediacrush
 
   -a, --album             Create an album from the uploaded files
@@ -23,7 +23,7 @@ For more details see man mediacrush
   -r, --recursive         Recursively upload directories
       --interactive       Force interactive mode
       --non-interactive   Force non-interactive mode
-  -s, --server <server>   Specifies an alternate MediaCrush server. (Default: https://mediacru.sh)
+  -s, --server <server>   Specifies an alternate MediaCrush server. (Default: https://imgrush.com)
   -h, --help              Display this help and exit
       --version           Output version information and exit
   -c, --copy              Send url to clipboard using xsel or xclip
